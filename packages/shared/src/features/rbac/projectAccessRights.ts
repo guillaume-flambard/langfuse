@@ -73,7 +73,7 @@ export const projectScopes = [
   "promptExperiments:CUD",
   "promptExperiments:read",
 
-  "auditLogs:read",
+  "projectAuditLogs:read",
 
   "TableViewPresets:CUD",
   "TableViewPresets:read",
@@ -149,7 +149,7 @@ export const projectRoleAccessRights: Record<Role, ProjectScope[]> = {
     "annotationQueueAssignments:CUD",
     "promptExperiments:CUD",
     "promptExperiments:read",
-    "auditLogs:read",
+    "projectAuditLogs:read",
     "dashboards:read",
     "dashboards:CUD",
     "TableViewPresets:CUD",
@@ -206,7 +206,7 @@ export const projectRoleAccessRights: Record<Role, ProjectScope[]> = {
     "annotationQueueAssignments:CUD",
     "promptExperiments:CUD",
     "promptExperiments:read",
-    "auditLogs:read",
+    "projectAuditLogs:read",
     "dashboards:read",
     "dashboards:CUD",
     "TableViewPresets:CUD",

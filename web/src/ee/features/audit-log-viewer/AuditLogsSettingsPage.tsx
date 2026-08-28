@@ -7,7 +7,7 @@ import { useHasProjectAccess } from "@/src/features/rbac/utils/checkProjectAcces
 export function AuditLogsSettingsPage(props: { projectId: string }) {
   const hasAccess = useHasProjectAccess({
     projectId: props.projectId,
-    scope: "auditLogs:read",
+    scope: "projectAuditLogs:read",
   });
   const hasEntitlement = useHasEntitlement("audit-logs");
 

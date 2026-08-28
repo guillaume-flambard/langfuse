@@ -7,7 +7,7 @@ import { useHasOrganizationAccess } from "@/src/features/rbac/utils/checkOrganiz
 export function OrgAuditLogsSettingsPage(props: { orgId: string }) {
   const hasAccess = useHasOrganizationAccess({
     organizationId: props.orgId,
-    scope: "auditLogs:read",
+    scope: "orgAuditLogs:read",
   });
   const hasEntitlement = useHasEntitlement("audit-logs");
 
