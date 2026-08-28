@@ -16,6 +16,7 @@ import {
   redis,
   ProjectDeleteQueue,
   getEnvironmentsForProject,
+  invalidateCachedOrgApiKeys,
 } from "@langfuse/shared/src/server";
 import { randomUUID } from "crypto";
 import { StringNoHTMLNonEmpty } from "@langfuse/shared";
@@ -66,6 +67,9 @@ export const projectsRouter = createTRPCRouter({
         action: "create",
         after: project,
       });
+
+      // Refresh org-scoped keys' baked projectIds now that a project exists.
+      await invalidateCachedOrgApiKeys(input.orgId);
 
       // Best-effort CHB metering signal; no-op unless the org is CHB-billed
       emitChbProjectEvent({
