@@ -1,11 +1,11 @@
 /* eslint-disable @repo/no-style-props */
-import { type RouterOutputs } from "@/src/utils/api";
+import { api, type RouterOutputs } from "@/src/utils/api";
 import { getNumberFromMap } from "@/src/utils/map-utils";
 import { ActionButtonCountBadge } from "@/src/components/ui/action-button-count-badge";
 import { Button } from "@/src/components/ui/button";
 import { AnnotateDrawerController } from "@/src/features/scores/components/AnnotateDrawerController";
 import { CommentDrawerController } from "@/src/features/comments/CommentDrawerController";
-import { NewDatasetItemFromTraceId } from "@/src/components/session/NewDatasetItemFromTrace";
+import { NewDatasetItemFromExistingObject } from "@/src/features/datasets/components/NewDatasetItemFromExistingObject";
 import { AnnotationQueueItemDropdownMenuController } from "@/src/features/annotation-queues/components/AnnotationQueueItemDropdownMenuController";
 import { AnnotationQueueItemCountBadge } from "@/src/features/annotation-queues/components/AnnotationQueueItemCountBadge";
 import { cn } from "@/src/utils/tailwind";
@@ -41,16 +41,32 @@ export function SessionTraceActionButtons({
 }) {
   const size = density === "compact" ? "xs" : "default";
   const commentCount = getNumberFromMap(traceCommentCounts, traceId);
+  // SessionIO already fetches the trace, so this reads from the same query cache.
+  const trace = api.traces.byId.useQuery(
+    { traceId, projectId, timestamp },
+    {
+      trpc: {
+        context: {
+          skipBatch: true,
+        },
+      },
+      refetchOnMount: false,
+    },
+  );
 
   return (
     <div className={cn("flex flex-wrap items-start gap-2", className)}>
-      <NewDatasetItemFromTraceId
-        projectId={projectId}
-        traceId={traceId}
-        timestamp={timestamp}
-        buttonVariant="outline"
-        size={size}
-      />
+      {trace.data && (
+        <NewDatasetItemFromExistingObject
+          projectId={projectId}
+          traceId={traceId}
+          input={trace.data.input ?? null}
+          output={trace.data.output ?? null}
+          metadata={trace.data.metadata ?? null}
+          buttonVariant="outline"
+          size={size}
+        />
+      )}
       <div className="flex items-start">
         <AnnotateDrawerController
           key={`annotation-drawer-${traceId}`}
