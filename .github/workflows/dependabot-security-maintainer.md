@@ -71,11 +71,23 @@ steps:
     run: |
       set -euo pipefail
       mkdir -p "$(dirname "$ALERTS_PATH")"
-      gh api --method GET --paginate --slurp \
+      # Dependabot alerts are a repository setting, and they are disabled on this
+      # fork, so the API answers 403. That is an absent input, not a failure:
+      # record no open alerts and let the agent finish. Any other error is still
+      # a real failure and must stop the run.
+      if err=$(gh api --method GET --paginate --slurp \
         -H "Accept: application/vnd.github+json" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
         "repos/${GITHUB_REPOSITORY}/dependabot/alerts?state=open&ecosystem=npm&per_page=100" \
-        | jq 'add' > "$ALERTS_PATH"
+        2>&1 >"$ALERTS_PATH.pages"); then
+        jq 'add' <"$ALERTS_PATH.pages" >"$ALERTS_PATH"
+      elif printf '%s' "$err" | grep -q "Dependabot alerts are disabled"; then
+        echo '[]' >"$ALERTS_PATH"
+      else
+        printf '%s\n' "$err" >&2
+        exit 1
+      fi
+      rm -f "$ALERTS_PATH.pages"
       jq -e 'type == "array"' "$ALERTS_PATH" >/dev/null
 
 safe-outputs:
